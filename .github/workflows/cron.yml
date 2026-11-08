@@ -10,6 +10,8 @@ jobs:
     steps:
     - name: Clonar repositorio
       uses: actions/checkout@v3
+      with:
+        persist-credentials: true
 
     - name: Configurar Python
       uses: actions/setup-python@v4
@@ -24,5 +26,4 @@ jobs:
         git config --global user.name "BotAnalista"
         git config --global user.email "bot@analista.com"
         git add index.html
-        git diff --quiet && git diff --staged --quiet || (git commit -m "Actualización multi-deporte automática" && git push)
-        
+        git diff --quiet && git diff --staged --quiet || (git commit -m "Actualización automática multi-deporte" && git push)
