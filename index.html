@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistente de Orientación Deportiva</title>
+    <style>
+        body { background-color: #0e1117; color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; padding: 15px; margin: 0; }
+        h2 { color: #00f2fe; margin-bottom: 5px; font-size: 1.4rem; }
+        label { font-size: 0.9rem; color: #aaa; display: block; margin-top: 15px; margin-bottom: 5px; }
+        select { background-color: #1f293d; color: white; border: 1px solid #3b4252; padding: 10px; width: 100%; border-radius: 8px; font-size: 1rem; outline: none; }
+        .chat-box { background-color: #1f293d; padding: 15px; border-radius: 12px; margin-top: 15px; border-left: 5px solid #00f2fe; line-height: 1.5; font-size: 0.95rem; }
+        .btn-parlay { background: linear-gradient(45deg, #00f2fe, #4facfe); color: black; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; font-size: 1rem; margin-top: 15px; cursor: pointer; }
+        .parlay-box { background-color: #112233; padding: 15px; border-radius: 12px; border: 1px dashed #ff007f; margin-top: 15px; font-size: 0.9rem; line-height: 1.5; }
+        .divider { border-bottom: 1px solid #2e3440; margin: 15px 0; }
+    </style>
+</head>
+<body>
+
+    <h2>🤖 Asistente de Orientación</h2>
+    <p style="color: #8892b0; font-size: 0.85rem; margin: 0;">Análisis real para los partidos de hoy (8 de Nov, 2026)</p>
+
+    <label for="ligaSelect">🌍 Selecciona una Liga:</label>
+    <select id="ligaSelect" onchange="cargarPartidoEstelar()">
+        <option value="ligamx">Liga MX (México)</option>
+        <option value="premier">Premier League (Inglaterra)</option>
+    </select>
+
+    <div id="chatContainer" class="chat-box"></div>
+
+    <div class="divider"></div>
+    <p style="font-size: 0.9rem; text-align: center; color: #aaa; margin-bottom: 5px;">🔥 ¿Te gustaría que te arme un parlay de la liga elegida?</p>
+    <button class="btn-parlay" onclick="generarParlay()">✅ Sí, arma el parlay</button>
+
+    <div id="parlayContainer"></div>
+
+    <script>
+        const datosLigas = {
+            ligamx: {
+                nombre: "Liga MX",
+                estelar: { local: "León", visitante: "Chivas", pL: 34.2, pE: 28.5, pV: 37.3 },
+                partidos: [
+                    { local: "León", visitante: "Chivas", pL: 34.2, pV: 37.3, pred: "Chivas (Visitante o Empate)" },
+                    { local: "Querétaro", visitante: "Puebla", pL: 41.0, pV: 31.5, pred: "Querétaro (Local o Empate)" }
+                ]
+            },
+            premier: {
+                nombre: "Premier League",
+                estelar: { local: "Manchester United", visitante: "Aston Villa", pL: 28.4, pE: 21.2, pV: 50.4 },
+                partidos: [
+                    { local: "Manchester United", visitante: "Aston Villa", pL: 28.4, pV: 50.4, pred: "Aston Villa (Visitante)" }
+                ]
+            }
+        };
+
+        function cargarPartidoEstelar() {
+            const ligaSeleccionada = document.getElementById("ligaSelect").value;
+            const info = datosLigas[ligaSeleccionada];
+            const estelar = info.estelar;
+            
+            let recomendacion = estelar.pL > estelar.pV ? `te recomiendo jugar una oportunidad a favor del local (<b>${estelar.local}</b>)` : `te recomiendo asegurar con doble oportunidad o directo al visitante (<b>${estelar.visitante}</b>)`;
+            
+            const htmlChat = `
+                <b>¡Hola Bro!</b> Analicé las métricas reales para hoy domingo. En el partido estelar de la ${info.nombre}:<br><br>
+                ⚽ <b>${estelar.local} vs ${estelar.visitante}</b><br>
+                • Porcentaje Gana Local: ${estelar.pL}%<br>
+                • Porcentaje Gana Visitante: ${estelar.pV}%<br>
+                • Porcentaje Empate: ${estelar.pE}%<br><br>
+                🎯 Evaluando el rendimiento actual de la jornada, ${recomendacion}.
+            `;
+            
+            document.getElementById("chatContainer").innerHTML = htmlChat;
+            document.getElementById("parlayContainer").innerHTML = ""; 
+        }
+
+        function generarParlay() {
+            const ligaSeleccionada = document.getElementById("ligaSelect").value;
+            const info = datosLigas[ligaSeleccionada];
+            
+            let parlayHtml = `<div class="parlay-box"><b>🔥 TU PARLAY SUGERIDO 🔥</b><br><br>`;
+            let probCombinada = 1.0;
+
+            info.partidos.forEach(p => {
+                parlayHtml += `• ${p.local} vs ${p.visitante} ➔ <b>${p.pred}</b><br>`;
+                let mayorProb = Math.max(p.pL, p.pV) / 100;
+                probCombinada *= mayorProb;
+            });
+
+            let pctFinal = (probCombinada * 100).toFixed(2);
+            parlayHtml += `<br>📈 <b>Confianza matemática combinada:</b> ${pctFinal}%</div>`;
+            
+            document.getElementById("parlayContainer").innerHTML = parlayHtml;
+        }
+
+        window.onload = cargarPartidoEstelar;
+    </script>
+</body>
+</html>
